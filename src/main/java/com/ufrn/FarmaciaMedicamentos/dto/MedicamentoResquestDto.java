@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class medicamentoResquestDto {
+public class MedicamentoResquestDto {
     String nomeComercial;
     String laboratorio;
     Double preco;
