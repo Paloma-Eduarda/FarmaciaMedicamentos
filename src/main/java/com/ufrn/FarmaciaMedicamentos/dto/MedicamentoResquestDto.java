@@ -1,12 +1,12 @@
 package com.ufrn.FarmaciaMedicamentos.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class MedicamentoResquestDto {
     String nomeComercial;
     String laboratorio;
@@ -15,3 +15,4 @@ public class MedicamentoResquestDto {
     String dosagem;
     boolean necessitaReceita;
 }
+

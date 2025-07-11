@@ -1,8 +1,11 @@
 package com.ufrn.FarmaciaMedicamentos.dto;
 
+
+import com.ufrn.FarmaciaMedicamentos.controller.MedicamentoController;
 import com.ufrn.FarmaciaMedicamentos.domain.Medicamento;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
 
 public class MedicamentoResponseDto extends RepresentationModel<MedicamentoResponseDto> {
     private String medicamento;
