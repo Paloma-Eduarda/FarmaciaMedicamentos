@@ -11,8 +11,8 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @Data
 @ToString
-@SQLDelete(sql = "UPDATE medicamente SET deleted_at = CURRENT_TIMESTAMP where id=?")
-@SQLRestriction("deleted_at is null")
+@SQLDelete(sql = "UPDATE medicamento SET data_exclusao = CURRENT_TIMESTAMP where id=?")
+@SQLRestriction("data_exclusao is null")
 public class Medicamento extends BaseEntity {
 
     @NotBlank

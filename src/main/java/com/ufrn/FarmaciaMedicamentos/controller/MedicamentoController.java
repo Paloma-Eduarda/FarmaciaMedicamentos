@@ -76,10 +76,12 @@ public class MedicamentoController {
         return ResponseEntity.notFound().build();
     }
 
-//    // DELETE - Remover
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> deletar(@PathVariable Long id)  {
-//        medicamentoService.deletar(id);
-//        return ResponseEntity.noContent().build();
-//    }
+    // DELETE - Remover
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id)  {
+
+        Optional<Medicamento> medicamento = medicamentoService.buscarPorId(id);
+        medicamentoService.remover(id);
+        return ResponseEntity.noContent().build();
+    }
 }

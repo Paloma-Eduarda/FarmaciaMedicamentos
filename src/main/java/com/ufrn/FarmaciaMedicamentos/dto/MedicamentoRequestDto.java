@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MedicamentoRequestDto {
+    Long id;
     String nomeComercial;
     String laboratorio;
     Double preco;
