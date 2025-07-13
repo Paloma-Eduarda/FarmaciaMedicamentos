@@ -1,10 +1,8 @@
 package com.ufrn.FarmaciaMedicamentos.domain;
 
 import jakarta.persistence.Entity;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 @EqualsAndHashCode(callSuper = true)
@@ -12,15 +10,17 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@ToString
 @SQLDelete(sql = "UPDATE medicamente SET deleted_at = CURRENT_TIMESTAMP where id=?")
 @SQLRestriction("deleted_at is null")
 public class Medicamento extends BaseEntity {
 
-    private String nomeComercial;
-    private String laboratorio;
-    private Double preco;
-    private String principioAtivo;
-    private String dosagem;
-    private boolean necessitaReceita;
+    @NotBlank
+    String nomeComercial;
+    String laboratorio;
+    Double preco;
+    String principioAtivo;
+    String dosagem;
+    boolean necessitaReceita;
 
 }

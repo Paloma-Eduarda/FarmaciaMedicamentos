@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @MappedSuperclass
 @Getter
@@ -15,12 +16,22 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
     @CreationTimestamp
-    @Column(updatable = false)
-    private LocalDateTime dataCriacao;
-    private LocalDateTime dataExclusao = null;
+    LocalDateTime dataCriacao;
+    LocalDateTime dataExclusao = null;
     @UpdateTimestamp
-    private LocalDateTime dataAtualizacao = null;
+    LocalDateTime dataAtualizacao = null;
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        BaseEntity that = (BaseEntity) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

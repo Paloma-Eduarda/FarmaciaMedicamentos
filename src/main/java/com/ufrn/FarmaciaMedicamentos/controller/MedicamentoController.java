@@ -9,15 +9,20 @@ import com.ufrn.FarmaciaMedicamentos.mapper.MedicamentoMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/medicamentos")
 public class MedicamentoController {
 
-    private final MedicamentoService medicamentoService;
-    private final MedicamentoMapper medicamentoMapper;
+    final MedicamentoService medicamentoService;
+    final MedicamentoMapper medicamentoMapper;
 
     public MedicamentoController(MedicamentoService medicamentoService, MedicamentoMapper medicamentoMapper) {
         this.medicamentoService = medicamentoService;
@@ -26,43 +31,55 @@ public class MedicamentoController {
 
     // GET - Listar todos
     @GetMapping
-    public ResponseEntity<List<MedicamentoResponseDto>> listarTodos() {
-        List<Medicamento> medicamentos = medicamentoService.listarTodos();
-        List<MedicamentoResponseDto> dtos = medicamentos.stream()
-                .map(medicamentoMapper::toDto)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
+    public List<MedicamentoResponseDto> listarTodos() {
+        List<Medicamento> medicamentos = medicamentoService.listar();
+        List<MedicamentoResponseDto> dtos = new ArrayList<>();
+
+        for(Medicamento medicamento : medicamentos) {
+                MedicamentoResponseDto dtoLocal = medicamentoMapper.toDto(medicamento);
+                dtoLocal.loadLinks(medicamento);
+                dtos.add(dtoLocal);
+        }
+
+        return dtos;
     }
 
     // GET - Buscar por ID
     @GetMapping("/{id}")
     public ResponseEntity<MedicamentoResponseDto> buscarPorId(@PathVariable Long id) {
-        Medicamento medicamento = medicamentoService.buscarPorId(id);
-        MedicamentoResponseDto dto = medicamentoMapper.toDto(medicamento);
-        return ResponseEntity.ok(dto);
+        Optional<Medicamento> medicamento = medicamentoService.buscarPorId(id);
+        if(medicamento.isPresent()) {
+            MedicamentoResponseDto dto = medicamentoMapper.toDto(medicamento.get());
+            return ResponseEntity.ok(dto);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     // POST - Criar novo
     @PostMapping
-    public ResponseEntity<MedicamentoResponseDto> salvar(@Valid @RequestBody MedicamentoRequestDto dto) {
+    public ResponseEntity<?> salvar(@RequestBody MedicamentoRequestDto dto)throws URISyntaxException {
         Medicamento medicamento = medicamentoMapper.toEntity(dto);
-        Medicamento salvo = medicamentoService.salvar(medicamento);
+        Medicamento salvo = medicamentoService.adicionar(medicamento);
         MedicamentoResponseDto responseDto = medicamentoMapper.toDto(salvo);
-        return ResponseEntity.status(201).body(responseDto);
+        return ResponseEntity.created(new URI("/medicamentos"+medicamento.getId())).build();
     }
 
     // PUT - Atualizar
     @PutMapping("/{id}")
-    public ResponseEntity<MedicamentoResponseDto> atualizar(@PathVariable Long id,
-                                                            @Valid @RequestBody MedicamentoRequestDto dto) {
-        Medicamento atualizado = medicamentoService.atualizar(id, dto);
-        return ResponseEntity.ok(medicamentoMapper.toDto(atualizado));
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Medicamento m) {
+
+        Optional<Medicamento> medicamento = medicamentoService.buscarPorId(id);
+        if(medicamento.isPresent()) {
+            return ResponseEntity.ok(medicamentoService.alterar(m));
+        }
+
+        return ResponseEntity.notFound().build();
     }
 
-    // DELETE - Remover
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        medicamentoService.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
+//    // DELETE - Remover
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deletar(@PathVariable Long id)  {
+//        medicamentoService.deletar(id);
+//        return ResponseEntity.noContent().build();
+//    }
 }
