@@ -24,7 +24,7 @@ public abstract class AbstractService<T, R extends JpaRepository<T, Long>> imple
     public T adicionar(T entity ) {
         return repo.save(entity);
     }
-
+    //perguntar
     public T alterar(T entity) {
         return repo.save(entity);
     }
