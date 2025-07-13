@@ -2,6 +2,7 @@ package com.ufrn.FarmaciaMedicamentos.controller;
 
 import com.ufrn.FarmaciaMedicamentos.Service.MedicamentoService;
 import com.ufrn.FarmaciaMedicamentos.domain.Medicamento;
+import com.ufrn.FarmaciaMedicamentos.dto.MedicamentoRequestDto;
 import com.ufrn.FarmaciaMedicamentos.dto.MedicamentoResponseDto;
 import com.ufrn.FarmaciaMedicamentos.mapper.MedicamentoMapper;
 
