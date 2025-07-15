@@ -1,6 +1,8 @@
 package com.ufrn.FarmaciaMedicamentos.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -22,5 +24,7 @@ public class Medicamento extends BaseEntity {
     String principioAtivo;
     String dosagem;
     boolean necessitaReceita;
-
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    Categoria categoria;
 }

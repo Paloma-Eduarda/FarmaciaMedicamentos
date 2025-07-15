@@ -1,4 +1,4 @@
-package com.ufrn.FarmaciaMedicamentos.security.controller;
+package com.ufrn.FarmaciaMedicamentos.security;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,7 +26,6 @@ public class TokenService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
 
-        // Criação das minhas CLAIMS do JWT
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(now)
