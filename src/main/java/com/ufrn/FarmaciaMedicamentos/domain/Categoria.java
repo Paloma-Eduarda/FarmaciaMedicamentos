@@ -13,7 +13,7 @@ public class Categoria extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int idade;
 
     private String nome;
 
