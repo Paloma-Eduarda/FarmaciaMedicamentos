@@ -6,82 +6,82 @@ import com.ufrn.FarmaciaMedicamentos.dto.MedicamentoRequestDto;
 import com.ufrn.FarmaciaMedicamentos.dto.MedicamentoResponseDto;
 import com.ufrn.FarmaciaMedicamentos.mapper.MedicamentoMapper;
 
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/medicamentos")
+@RequiredArgsConstructor
 public class MedicamentoController {
 
-    final MedicamentoService medicamentoService;
-    final MedicamentoMapper medicamentoMapper;
+    private final MedicamentoService medicamentoService;
+    private final MedicamentoMapper medicamentoMapper;
 
-    public MedicamentoController(MedicamentoService medicamentoService, MedicamentoMapper medicamentoMapper) {
-        this.medicamentoService = medicamentoService;
-        this.medicamentoMapper = medicamentoMapper;
-    }
-
-    // GET - Listar todos
+    // GET - Listar todos com paginação
     @GetMapping
-    public List<MedicamentoResponseDto> listarTodos() {
-        List<Medicamento> medicamentos = medicamentoService.listar();
-        List<MedicamentoResponseDto> dtos = new ArrayList<>();
-
-        for(Medicamento medicamento : medicamentos) {
-                MedicamentoResponseDto dtoLocal = medicamentoMapper.toDto(medicamento);
-                dtoLocal.loadLinks(medicamento);
-                dtos.add(dtoLocal);
-        }
-
-        return dtos;
+    public ResponseEntity<Page<MedicamentoResponseDto>> listAll(Pageable pageable) {
+        Page<Medicamento> medicamentosPage = medicamentoService.listAll(pageable);
+        Page<MedicamentoResponseDto> dtoPage = medicamentosPage.map(medicamentoMapper::toDto);
+        return ResponseEntity.ok(dtoPage);
     }
 
     // GET - Buscar por ID
     @GetMapping("/{id}")
     public ResponseEntity<MedicamentoResponseDto> buscarPorId(@PathVariable Long id) {
-        Optional<Medicamento> medicamento = medicamentoService.buscarPorId(id);
-        if(medicamento.isPresent()) {
-            MedicamentoResponseDto dto = medicamentoMapper.toDto(medicamento.get());
+        try {
+            Medicamento medicamento = medicamentoService.listById(id);
+            MedicamentoResponseDto dto = medicamentoMapper.toDto(medicamento);
             return ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     // POST - Criar novo
     @PostMapping
-    public ResponseEntity<?> salvar(@RequestBody MedicamentoRequestDto dto)throws URISyntaxException {
-        Medicamento medicamento = medicamentoMapper.toEntity(dto);
-        Medicamento salvo = medicamentoService.adicionar(medicamento);
+    public ResponseEntity<MedicamentoResponseDto> salvar(@RequestBody MedicamentoRequestDto dto) {
+        Medicamento entity = medicamentoMapper.toEntity(dto);
+        Medicamento salvo = medicamentoService.create(entity);
         MedicamentoResponseDto responseDto = medicamentoMapper.toDto(salvo);
-        return ResponseEntity.created(new URI("/medicamentos"+medicamento.getId())).build();
+        return ResponseEntity.created(URI.create("/medicamentos/" + salvo.getId()))
+                .body(responseDto);
     }
 
     // PUT - Atualizar
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Medicamento m) {
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody MedicamentoRequestDto dto) {
+        try {
+            Medicamento medicamento = medicamentoService.listById(id); // verifica se existe
+            medicamento.setNomeComercial(dto.getNomeComercial());
+            medicamento.setLaboratorio(dto.getLaboratorio());
+            medicamento.setPreco(dto.getPreco());
+            medicamento.setPrincipioAtivo(dto.getPrincipioAtivo());
+            medicamento.setDosagem(dto.getDosagem());
+            medicamento.setNecessitaReceita(dto.isNecessitaReceita());
 
-        Optional<Medicamento> medicamento = medicamentoService.buscarPorId(id);
-        if(medicamento.isPresent()) {
-            return ResponseEntity.ok(medicamentoService.alterar(m));
+            Medicamento atualizado = medicamentoService.update(medicamento, id);
+            return ResponseEntity.ok(atualizado);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Medicamento não encontrado.");
         }
-
-        return ResponseEntity.notFound().build();
     }
 
     // DELETE - Remover
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id)  {
-
-        Optional<Medicamento> medicamento = medicamentoService.buscarPorId(id);
-        medicamentoService.remover(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        try {
+            medicamentoService.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
+

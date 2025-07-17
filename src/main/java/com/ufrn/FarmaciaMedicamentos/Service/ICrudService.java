@@ -1,12 +1,20 @@
 package com.ufrn.FarmaciaMedicamentos.Service;
 
-import java.util.List;
-import java.util.Optional;
 
-public interface ICrudService<T> {
-    public List<T> listar();
-    public Optional<T> buscarPorId(Long id);
-    public T adicionar(T p);
-    public T alterar(T p);
-    public void remover(Long id);
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+
+public interface ICrudService<T, ID> {
+    public T create(T entity);
+
+    public Page<T> listAll(Pageable pageable);
+
+    public T listById(ID id);
+
+    public void deleteById(ID id);
+
+    public T update(T entity, ID id);
+
 }
